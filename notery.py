@@ -14,12 +14,23 @@ class Notery:
         
         return credentials
 
-    
+    def load_tags(self):
+        with open('tags.json', 'r', encoding='utf-8') as f:
+            tags = json.load(f)
+        
+        return tags
+
     def get_notes(self, keep):
-        #notes = k.all()
-        for note in keep:
-            if note.title == 'TEST':
-                print([note.title, note.text])
+        
+
+        tags = self.load_tags()
+        for tag in tags['Tags']:
+            print(tag)
+
+        notes = keep.find(labels=[keep.findLabel('reference')])
+        
+        for note in notes:
+            print([note.title, note.text])
 
     def login(self):
         keep = gkeepapi.Keep()
@@ -39,7 +50,7 @@ def main():
     notery = Notery()
     keep = notery.login()
     
-    notery.get_notes(keep.all())
+    notery.get_notes(keep) #(keep.all())
 
 if __name__ == "__main__":
     main()
