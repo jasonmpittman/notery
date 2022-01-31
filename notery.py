@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+__author__ = "Jason M. Pittman"
+__copyright__ = "Copyright 2022"
+__credits__ = ["Jason M. Pittman"]
+__license__ = "GPLv3"
+__version__ = "0.1.0"
+__maintainer__ = "Jason M. Pittman"
+__email__ = "jason@jasonmpittman.com"
+__status__ = "Development"
+
 import json
 import gkeepapi
 
@@ -31,6 +40,7 @@ class Notery:
         
         for note in notes:
             print([note.title, note.text])
+            print("\n")
 
     def login(self):
         keep = gkeepapi.Keep()
