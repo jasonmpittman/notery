@@ -9,18 +9,22 @@ __maintainer__ = "Jason M. Pittman"
 __email__ = "jason@jasonmpittman.com"
 __status__ = "Development"
 
+import re
 import json
 import gkeepapi
-import time
-import os
+#import time
+from os import path
+import configparser
 from datetime import datetime
-
-from note import Note
 
 class Notery:
 
     def __init__(self):
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+
         self.credentials = self.load_credentials()
+        self.zettel_dir = config['DEFAULT']['ZettelDir']
 
     def load_credentials(self):
         with open('credentials.json', 'r', encoding='utf-8') as f:
@@ -44,15 +48,18 @@ class Notery:
         tags = [x.strip() for x in t[0].split(',')]
 
         for tag in tags:
-
+            print("Searching for notes with tag " + tag)
             gnotes = keep.find(labels=[keep.findLabel(tag)])
-            
-            for gnote in gnotes:
-                n = Note(gnote)
-                notes.append(n)
-                #print([note.title, note.text])
-                #print("\n")            
-        
+            notes.append(gnotes)
+
+            #print(gnotes)
+
+            #for gnote in gnotes:
+            #    #print(gnote)
+            #    n = Note(gnote)
+            #    print(n)
+            #    notes.append(n)        
+
         return notes
 
     def login(self):
@@ -65,34 +72,58 @@ class Notery:
         finally:
             return keep
 
+    def parse_id(self, note_id):
+        match_id = re.search('\d{12}', note_id)
+        id = match_id.group(0)
 
-    def parse_text(self):
-        #need to parse gkeep 'text' into note components
-        #regex for hashtags
-        #regex for id datestring
+        return id
 
-        pass
+    def parse_title(self, note_title):
+        match_title = re.search('\D+', note_title)
+        title = match_title.group(0)
 
-    def write_zettel(self, note):
-        now = datetime.now()
-        stamp = now.strftime("%Y%d%m%H%M")
+        return title.strip(' - ')
 
-        try:
-            f = open(stamp + ".md", "w+")
-            f.write('---\n')
+    def parse_tags(self, note_text):
+        tags = re.findall('(#+[a-zA-Z0-9(_)]{1,})', note_text)
+        
+        return tags
+
+    def write_zettel(self, notes):
+        
+        for note in notes:
             
-            for k, v in self.__header.items():
-                f.write(str(k) + ': ' + str(v) + '\n')
-            
-            f.write('---\n\n')
+            try:
+                
+                id = self.parse_id(note.title)
+                title = self.parse_title(note.title)
+                tags = self.parse_tags(note.text)
+                
+                zettel = path.join(self.zettel_dir, id)
+                filename = '-' + title + '.md'
 
-            fields = self.__body.split(',')
-            for field in fields:
-                f.write('## ' + field.strip(' ') + '\n\n')
+                f = open(zettel + filename, 'w+')
 
-            f.close()
-        except Exception as e:
-            print('Error writing note: ' + str(e))
+                # build the zettel header
+                f.write('---\n')
+                
+                f.write('id: [[' + id + ']]' + '\n')
+                f.write('title: [[' + title + ']]' + '\n')
+                f.write('tags: ' + ' '.join(tags) + ' \n') 
+                
+                f.write('---\n\n')
+                # end the zettel header
+
+                # write the zettel body
+                f.write(note.text)
+
+                f.close()
+            except Exception as e:
+                print('Error writing note: ' + str(e))
+            else:
+                note.archived = True
+
+
 
 
 def main():
@@ -100,8 +131,10 @@ def main():
     keep = notery.login()
     
     notes = notery.get_notes(keep) #(keep.all())
-
+    for note in notes:
+        notery.write_zettel(note)
     
+    keep.sync()
 
 if __name__ == "__main__":
     main()
