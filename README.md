@@ -28,7 +28,10 @@ Installation is simple. The steps are:
     If you don't care about `venv`, you can skip this step.
 
 3. Define account credentials in credentials.json  
-Create a json file and add the following. Note: I would use an app password and not your actual account password. You can set this up using the [Google procedure](https://support.google.com/accounts/answer/185833?hl=en).
+Create a json file and add the following. Note: I would use an app password and not your actual account password. You can set this up using the [Google procedure](https://myaccount.google.com/apppasswords)
+<--I finally found a way to make persisent the authentication. You have to activate the 2 factor authentication in your Google account and then you have to create an application password for gkeepapi from: -->
+
+Then you have to use the application password instead your usual password in keep.login function (the username is the same).).
 
     ```
     {
