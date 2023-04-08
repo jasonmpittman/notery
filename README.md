@@ -11,7 +11,7 @@ Two guiding principles serve as the motivation for development of **Notery**. Fi
 
 ## Worfklow
 
-Notery is simple: it finds notes in Google Keep based on predefined labels (read: tags), writes them to local disk in a standardized zettelkasten format, and then archives those notes in Keep.
+Notery is simple: it finds notes in Google Keep based on predefined labels (read: tags), writes them to local disk in a standardized zettelkasten format, and then archives those notes in Keep. The `find` ignores Keep notes that have been archived.
 
 <br>
 
@@ -28,8 +28,9 @@ Installation is simple. The steps are:
     If you don't care about `venv`, you can skip this step.
 
 3. Define account credentials in credentials.json  
-Create a json file and add the following. Note: I would use an app password and not your actual account password. You can set this up using the [Google procedure](https://myaccount.google.com/apppasswords)
-<--I finally found a way to make persisent the authentication. You have to activate the 2 factor authentication in your Google account and then you have to create an application password for gkeepapi from: -->
+Create a json file and add the following. Note: I would use an app password and not your Google account password. You can set this up using the [Google procedure](https://myaccount.google.com/apppasswords)
+
+You have to activate the 2 factor authentication in your Google account and then you have to create an application password for gkeepapi. That's the password you use instead of your Google account password.
 
 Then you have to use the application password instead your usual password in keep.login function (the username is the same).).
 
@@ -56,7 +57,7 @@ Edit the `config.ini` with the full path to where you want **Notery** to write t
 <br>
 
 ## Running Notery
-Notery is easy to use. From a shell, run `python3 notery.py` and you are done.
+Notery is easy to use. From a shell, run `python3 notery.py -w` and you are done. You can also list the Keep notes without writing them to local disk using `pyhton3 notery.py -l`.
 
 <br>
 
